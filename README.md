@@ -184,3 +184,10 @@ Managing Python virtual environments is a valuable skill.
 This project is licensed under the MIT License as an example project. 
 You are encouraged to fork, copy, explore, and modify the code as you like. 
 See the [LICENSE](LICENSE.txt) file for more.
+
+
+# Run the producer first
+python producers/producer_case.py
+
+# Run the custom consumer
+python consumers/consumer_huzaifa.py
