@@ -1,7 +1,7 @@
 """
 producer_case.py
 
-Stream JSON data to a file and - if available - a Kafka topic.
+Stream JSON data to a file.
 
 Example JSON message
 {
@@ -23,36 +23,21 @@ Environment variables are in utils/utils_config module.
 
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-import utils.utils_config as config
-
-
-
-
-
-
-# import from standard library
 import json
-import os
 import pathlib
 import random
-import sys
 import time
 from datetime import datetime
 
-# import external modules
-from kafka import KafkaProducer
+# Ensure the utils module is accessible
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# import from local modules
 import utils.utils_config as config
-from utils.utils_producer import verify_services, create_kafka_topic
 from utils.utils_logger import logger
 
 #####################################
 # Stub Sentiment Analysis Function
 #####################################
-
 
 def assess_sentiment(text: str) -> float:
     """
@@ -61,11 +46,9 @@ def assess_sentiment(text: str) -> float:
     """
     return round(random.uniform(0, 1), 2)
 
-
 #####################################
 # Define Message Generator
 #####################################
-
 
 def generate_messages():
     """
@@ -125,30 +108,25 @@ def generate_messages():
 
         yield json_message
 
-
 #####################################
 # Define Main Function
 #####################################
 
-
 def main() -> None:
 
     logger.info("Starting Producer to run continuously.")
-    logger.info("Things can fail or get interrupted, so use a try block.")
     logger.info("Moved .env variables into a utils config module.")
 
     logger.info("STEP 1. Read required environment variables.")
 
     try:
         interval_secs: int = config.get_message_interval_seconds_as_int()
-        topic: str = config.get_kafka_topic()
-        kafka_server: str = config.get_kafka_broker_address()
         live_data_path: pathlib.Path = config.get_live_data_path()
     except Exception as e:
         logger.error(f"ERROR: Failed to read environment variables: {e}")
         sys.exit(1)
 
-    logger.info("STEP 2. Delete the live data file if exists to start fresh.")
+    logger.info("STEP 2. Delete the live data file if it exists to start fresh.")
 
     try:
         if live_data_path.exists():
@@ -161,41 +139,14 @@ def main() -> None:
         logger.error(f"ERROR: Failed to delete live data file: {e}")
         sys.exit(2)
 
-    logger.info("STEP 4. Try to create a Kafka producer and topic.")
-    producer = None
-
-    try:
-        verify_services()
-        producer = KafkaProducer(
-            bootstrap_servers=kafka_server,
-            value_serializer=lambda x: json.dumps(x).encode("utf-8"),
-        )
-        logger.info(f"Kafka producer connected to {kafka_server}")
-    except Exception as e:
-        logger.warning(f"WARNING: Kafka connection failed: {e}")
-        producer = None
-
-    if producer:
-        try:
-            create_kafka_topic(topic)
-            logger.info(f"Kafka topic '{topic}' is ready.")
-        except Exception as e:
-            logger.warning(f"WARNING: Failed to create or verify topic '{topic}': {e}")
-            producer = None
-
-    logger.info("STEP 5. Generate messages continuously.")
+    logger.info("STEP 4. Generate messages continuously.")
     try:
         for message in generate_messages():
             logger.info(message)
 
             with live_data_path.open("a") as f:
                 f.write(json.dumps(message) + "\n")
-                logger.info(f"STEP 4a Wrote message to file: {message}")
-
-            # Send to Kafka if available
-            if producer:
-                producer.send(topic, value=message)
-                logger.info(f"STEP 4b Sent message to Kafka topic '{topic}': {message}")
+                logger.info(f"Wrote message to file: {message}")
 
             time.sleep(interval_secs)
 
@@ -204,11 +155,7 @@ def main() -> None:
     except Exception as e:
         logger.error(f"ERROR: Unexpected error: {e}")
     finally:
-        if producer:
-            producer.close()
-            logger.info("Kafka producer closed.")
-        logger.info("TRY/FINALLY: Producer shutting down.")
-
+        logger.info("Producer shutting down.")
 
 #####################################
 # Conditional Execution
