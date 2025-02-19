@@ -23,6 +23,33 @@ Environment variables are in utils/utils_config module.
 # Import Modules
 #####################################
 
+
+from .db_sqlite_case import init_db, insert_message
+
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
+from db_sqlite_case import init_db, insert_message
+
+
+
+
+
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import utils.utils_config as config
+
+
+
+
+
+
+
 # import from standard library
 import json
 import pathlib

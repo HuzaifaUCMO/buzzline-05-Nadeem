@@ -21,6 +21,17 @@ Environment variables are in utils/utils_config module.
 # Import Modules
 #####################################
 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import utils.utils_config as config
+
+
+
+
+
+
 # import from standard library
 import json
 import os
