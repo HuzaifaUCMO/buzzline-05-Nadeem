@@ -193,3 +193,5 @@ python producers/producer_case.py
 python consumers/consumer_huzaifa.py
 
 My custom consumer, `consumer_huzaifa.py`, is designed to track keyword mentions in real-time from the live data stream. It reads messages from `live_data.jsonl`, extracts the `keyword_mentioned` field, and updates a SQLite database (`buzzline_data.db`) to keep a count of how often each keyword appears. This allows for trend analysis over time, helping to identify the most frequently discussed topics in the dataset. By storing keyword mentions alongside timestamps, this consumer provides insights into evolving discussions and potential viral trends. The decision to use SQLite ensures structured storage and easy querying, making it a lightweight yet effective solution for tracking keyword trends in real time.
+
+Moving on to p6
